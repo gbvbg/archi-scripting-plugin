@@ -45,6 +45,10 @@ public class ScriptsContextMenuContributionItem extends ContributionItem impleme
     
     @Override
     public void fill(Menu menu, int index) {
+        if(ExpiryCheck.hasExpired()) {
+            return;
+        }
+        
         if(menuManager != null) {
             menuManager.dispose();
         }

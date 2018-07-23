@@ -18,6 +18,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import com.archimatetool.script.ArchiScriptPlugin;
+import com.archimatetool.script.ExpiryCheck;
 import com.archimatetool.script.IArchiScriptImages;
 import com.archimatetool.script.preferences.IPreferenceConstants;
 
@@ -38,6 +39,11 @@ extends ViewPart {
     
     @Override
     public void createPartControl(Composite parent) {
+        if(ExpiryCheck.hasExpired()) {
+            ExpiryCheck.showMessage(parent);
+            return;
+        }
+        
         fTextPane = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         fTextPane.setEditable(false);
         fTextPane.setTabs(40);

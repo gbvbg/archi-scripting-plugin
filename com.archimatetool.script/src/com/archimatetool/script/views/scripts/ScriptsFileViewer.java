@@ -34,6 +34,7 @@ import org.eclipse.ui.PartInitException;
 import com.archimatetool.editor.utils.PlatformUtils;
 import com.archimatetool.editor.utils.StringUtils;
 import com.archimatetool.script.ArchiScriptPlugin;
+import com.archimatetool.script.ExpiryCheck;
 import com.archimatetool.script.IArchiScriptImages;
 import com.archimatetool.script.ScriptFiles;
 import com.archimatetool.script.preferences.IPreferenceConstants;
@@ -71,6 +72,11 @@ extends AbstractFileView  {
     
     @Override
     public void createPartControl(Composite parent) {
+        if(ExpiryCheck.hasExpired()) {
+            ExpiryCheck.showMessage(parent);
+            return;
+        }
+        
         super.createPartControl(parent);
         
         // Listen to Prefs
