@@ -14,6 +14,7 @@ import org.eclipse.gef.commands.CompoundCommand;
 import org.eclipse.osgi.util.NLS;
 
 import com.archimatetool.model.IArchimateModel;
+import com.archimatetool.script.RefreshUIHandler;
 
 /**
  * CommandHandler
@@ -46,9 +47,16 @@ public class CommandHandler {
         }
         
         cmd.perform();
+        
+        // Take this opportunity to update the UI if set
+        RefreshUIHandler.refresh();
     }
 
     public static void finalise(String scriptName) {
+        if(compoundcommands == null) {
+            return;
+        }
+        
         // This simply calls empty execute() methods since perform() has already been called, but puts the commmands on the stack
         for(Entry<CommandStack, CompoundCommand> e : compoundcommands.entrySet()) {
             e.getValue().setLabel(NLS.bind(Messages.CommandHandler_1, scriptName));

@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EStructuralFeature;
 
 import com.archimatetool.model.IArchimateFactory;
 import com.archimatetool.model.IArchimatePackage;
@@ -34,11 +33,11 @@ public class DiagramModelObjectProxy extends DiagramModelComponentProxy {
     }
     
     /**
-     * Add an Archimate element to an ArchiMate View and return the diagram object
+     * Add an Archimate element to this diagram object and return the new diagram object
      */
     public DiagramModelObjectProxy add(ArchimateElementProxy elementProxy, int x, int y, int width, int height) {
         if(getEObject() instanceof IDiagramModelContainer) {
-            return ModelUtil.addArchimateDiagramObject((IDiagramModelContainer)getEObject(), elementProxy.getEObject(), x, y, width, height);
+            return ModelFactory.addArchimateDiagramObject((IDiagramModelContainer)getEObject(), elementProxy.getEObject(), x, y, width, height, false);
         }
         
         throw new ArchiScriptException(Messages.DiagramModelObjectProxy_0);
@@ -49,7 +48,7 @@ public class DiagramModelObjectProxy extends DiagramModelComponentProxy {
      */
     public DiagramModelObjectProxy createObject(String type, int x, int y, int width, int height) {
         if(getEObject() instanceof IDiagramModelContainer) {
-            return ModelUtil.createDiagramObject((IDiagramModelContainer)getEObject(), type, x, y, width, height);
+            return ModelFactory.createDiagramObject((IDiagramModelContainer)getEObject(), type, x, y, width, height, false);
         }
         
         throw new ArchiScriptException(Messages.DiagramModelObjectProxy_1);
@@ -116,6 +115,13 @@ public class DiagramModelObjectProxy extends DiagramModelComponentProxy {
         return list;
     }
     
+    @Override
+    protected EObjectProxyCollection find() {
+        // We don't include relationships
+        EObjectProxyCollection all = super.find();
+        return all.filter(IModelConstants.ELEMENT);
+    }
+    
     public String getFillColor() {
         return getEObject().getFillColor();
     }
@@ -128,12 +134,7 @@ public class DiagramModelObjectProxy extends DiagramModelComponentProxy {
     }
     
     public int getOpacity() {
-        // Backward compatibility with Archi 4.2
-        EStructuralFeature feature = getEObject().eClass().getEStructuralFeature("alpha"); //$NON-NLS-1$
-        return feature != null ? (int)getEObject().eGet(feature) : 255;
-        
-        // TODO Replace with this...
-        // return getEObject().getAlpha();
+        return getEObject().getAlpha();
     }
     
     public DiagramModelObjectProxy setOpacity(int value) {
@@ -144,14 +145,7 @@ public class DiagramModelObjectProxy extends DiagramModelComponentProxy {
             value = 255;
         }
         
-        // Backward compatibility with Archi 4.2
-        EStructuralFeature feature = getEObject().eClass().getEStructuralFeature("alpha"); //$NON-NLS-1$
-        if(feature != null) {
-            CommandHandler.executeCommand(new SetCommand(getEObject(), feature, value));
-        }
-        
-        // TODO Replace with this...
-        //getEObject().setAlpha(value);
+        CommandHandler.executeCommand(new SetCommand(getEObject(), IArchimatePackage.Literals.DIAGRAM_MODEL_OBJECT__ALPHA, value));
         
         return this;
     }

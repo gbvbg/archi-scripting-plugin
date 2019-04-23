@@ -6,6 +6,9 @@
 package com.archimatetool.script.views.file;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -28,6 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+
+import com.archimatetool.editor.ui.components.TreeTextCellEditor;
 
 
 /**
@@ -174,16 +179,20 @@ public abstract class FileTreeViewer extends TreeViewer {
      */
     protected class FileTreeContentProvider implements ITreeContentProvider {
         
+        @Override
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
         }
         
+        @Override
         public void dispose() {
         }
         
+        @Override
         public Object[] getElements(Object parent) {
             return getChildren(parent);
         }
         
+        @Override
         public Object getParent(Object child) {
             if(child instanceof File) {
                 return ((File)child).getParentFile();
@@ -191,13 +200,26 @@ public abstract class FileTreeViewer extends TreeViewer {
             return null;
         }
         
+        @Override
         public Object [] getChildren(Object parent) {
             if(parent instanceof File) {
-                return ((File)parent).listFiles();
+                return ((File)parent).listFiles(new FileFilter() {
+                    @Override
+                    public boolean accept(File pathname) {
+                        try {
+                            return !Files.isHidden(pathname.toPath());
+                        }
+                        catch(IOException ex) {
+                            ex.printStackTrace();
+                        }
+                        return false;
+                    }
+                });
             }
             return new Object[0];
         }
         
+        @Override
         public boolean hasChildren(Object parent) {
             if(parent instanceof File) {
                 File f = (File)parent;

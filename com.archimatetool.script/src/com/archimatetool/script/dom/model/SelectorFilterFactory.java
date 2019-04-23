@@ -43,6 +43,7 @@ class SelectorFilterFactory {
         // All
         if(selector.equals("*")) { //$NON-NLS-1$
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     return (object instanceof IArchimateConcept || object instanceof IDiagramModel
                             || object instanceof IFolder);
@@ -51,8 +52,9 @@ class SelectorFilterFactory {
         }
         
         // All concepts
-        else if(selector.equals("concept")) { //$NON-NLS-1$
+        else if(selector.equals(IModelConstants.CONCEPT)) {
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     object = getReferencedConcept(object);
                     return object instanceof IArchimateConcept;
@@ -61,8 +63,9 @@ class SelectorFilterFactory {
         }
         
         // All elements
-        else if(selector.equals("element")) { //$NON-NLS-1$
+        else if(selector.equals(IModelConstants.ELEMENT)) {
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     object = getReferencedConcept(object);
                     return object instanceof IArchimateElement;
@@ -71,8 +74,9 @@ class SelectorFilterFactory {
         }
         
         // All relationships
-        else if(selector.equals("relation") || selector.equals("relationship")) { //$NON-NLS-1$ //$NON-NLS-2$
+        else if(selector.equals(IModelConstants.RELATION) || selector.equals(IModelConstants.RELATIONSHIP)) {
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     object = getReferencedConcept(object);
                     return object instanceof IArchimateRelationship;
@@ -81,8 +85,9 @@ class SelectorFilterFactory {
         }
 
         // All views
-        else if(selector.equals("view")) { //$NON-NLS-1$
+        else if(selector.equals(IModelConstants.VIEW)) {
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     return object instanceof IDiagramModel;
                 }
@@ -94,10 +99,12 @@ class SelectorFilterFactory {
             String id = selector.substring(1);
             
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     return object instanceof IIdentifier && id.equals(((IIdentifier)object).getId());
                 }
                 
+                @Override
                 public boolean isSingle() {
                     return true;
                 }
@@ -109,6 +116,7 @@ class SelectorFilterFactory {
             String name = selector.substring(1);
             
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     return (object instanceof INameable) && name.equals(((INameable)object).getName());
                 }
@@ -126,6 +134,7 @@ class SelectorFilterFactory {
             String name = s[1];
             
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     object = getReferencedConcept(object);
                     return object.eClass().getName().equals(type) &&
@@ -139,6 +148,7 @@ class SelectorFilterFactory {
         else {
             String type = ModelUtil.getCamelCase(selector);
             return new ISelectorFilter() {
+                @Override
                 public boolean accept(EObject object) {
                     object = getReferencedConcept(object);
                     return object.eClass().getName().equals(type) &&

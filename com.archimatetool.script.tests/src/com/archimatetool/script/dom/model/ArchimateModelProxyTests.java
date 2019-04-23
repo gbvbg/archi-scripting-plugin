@@ -63,8 +63,18 @@ public class ArchimateModelProxyTests extends EObjectProxyTests {
     }
     
     @Test
-    public void setAsCurrent() throws Exception {
-        assertNull(CurrentModel.INSTANCE.getEObject());
+    public void setAsCurrent() {
+        IArchimateModel model = null;
+        
+        // Initially this will be null and so will throw an ArchiScriptException
+        try {
+            model = CurrentModel.INSTANCE.getEObject();
+        }
+        catch(ArchiScriptException ex) {
+        }
+        
+        assertNull(model);
+        
         actualTestProxy.setAsCurrent();
         assertEquals(actualTestProxy, CurrentModel.INSTANCE);
     }
@@ -156,6 +166,15 @@ public class ArchimateModelProxyTests extends EObjectProxyTests {
         
         assertTrue(file.exists());
         assertTrue(file.length() > 100);
+    }
+    
+    @Test
+    public void getPath() {
+        assertNull(actualTestProxy.getPath());
+        
+        File file = new File("/path/test.archimate");
+        actualTestProxy.getEObject().setFile(file);
+        assertEquals(file.getAbsolutePath(), actualTestProxy.getPath());
     }
     
     @Test

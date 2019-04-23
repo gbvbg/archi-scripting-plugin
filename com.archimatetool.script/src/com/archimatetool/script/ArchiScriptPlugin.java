@@ -10,6 +10,7 @@ import java.io.File;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartService;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -62,8 +63,13 @@ public class ArchiScriptPlugin extends AbstractUIPlugin implements IPartListener
         if(PlatformUI.isWorkbenchRunning()) {
             // This needs to be on a thread
             Display.getDefault().asyncExec(new Runnable() {
+                @Override
                 public void run() {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService().addPartListener(ArchiScriptPlugin.this);
+                    IPartService service = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getPartService();
+                    service.addPartListener(ArchiScriptPlugin.this);
+                    
+                    // Initialise with active part
+                    partActivated(service.getActivePart());
                 }
             });
         }
@@ -71,27 +77,36 @@ public class ArchiScriptPlugin extends AbstractUIPlugin implements IPartListener
     
     
     
-    // Track current workbench parts
+    // Track current workbench part to get the current selection
+    // We have to do it this way because if the Script is run from the Scripts Manager View that will be the selection
+    
     private IWorkbenchPart currentPart;
 
+    @Override
     public void partActivated(IWorkbenchPart part) {
         if(part instanceof ITreeModelView || part instanceof IDiagramModelEditor) {
             currentPart = part;
         }
     }
 
+    @Override
     public void partDeactivated(IWorkbenchPart part) {
     }
 
+    @Override
     public void partBroughtToTop(IWorkbenchPart part) {
     }
 
+    @Override
     public void partClosed(IWorkbenchPart part) {
-        if(part instanceof ITreeModelView || part instanceof IDiagramModelEditor) {
+        // Tricky logic.
+        // Only set this to null if the part being closed is the current part
+        if(part == currentPart) {
             currentPart = null;
         }
     }
 
+    @Override
     public void partOpened(IWorkbenchPart part) {
     }
 

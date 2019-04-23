@@ -145,7 +145,7 @@ public class Model {
         
         try {
             ImageLoader loader = new ImageLoader();
-            loader.data = new ImageData[] { image.getImageData(ImageFactory.getDeviceZoom()) };
+            loader.data = new ImageData[] { image.getImageData(ImageFactory.getImageDeviceZoom()) };
             
             try(ByteArrayOutputStream stream = new ByteArrayOutputStream(1024)) {
                 loader.save(stream, imgFormat);
